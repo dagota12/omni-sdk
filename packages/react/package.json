@@ -9,6 +9,9 @@
   "peerDependencies": {
     "react": ">=16.8.0"
   },
+  "dependencies": {
+    "@omni-analytics/sdk": "workspace:*"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
