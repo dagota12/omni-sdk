@@ -18,8 +18,8 @@
     "README.md"
   ],
   "scripts": {
-    "build": "rollup -c ../../rollup.config.js",
-    "dev": "rollup -c ../../rollup.config.js --watch",
+    "build": "rollup -c rollup.config.js",
+    "dev": "rollup -c rollup.config.js --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "peerDependencies": {

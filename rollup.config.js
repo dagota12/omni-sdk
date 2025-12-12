@@ -34,18 +34,23 @@ const createConfig = (pkgName) => ({
       : []),
   ],
   plugins: [
-    nodeResolve(),
-    commonjs(),
     typescript({
       tsconfig: path.join(__dirname, `packages/${pkgName}/tsconfig.json`),
       compilerOptions: {
         declaration: true,
+        module: "esnext",
       },
+      exclude: ["node_modules/**"],
+      sourceMap: true,
     }),
+    nodeResolve({
+      extensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".json"],
+    }),
+    commonjs(),
   ],
   // For react package, externalize react/react-dom and SDK
   external:
-    pkgName === "react" ? ["react", "react-dom", "@omni-analytics/sdk"] : [],
+    pkgName === "react" ? ["react", "react-dom", "@omni-analytics/sdk", "@omni-analytics/react"] : [],
 });
 
 // Build configurations for both packages

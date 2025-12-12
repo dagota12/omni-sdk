@@ -186,6 +186,7 @@ export class Tracker {
    * Hash text using SHA256 (simple fallback to base64 hash)
    * In production, consider using a proper crypto library
    */
+  //TODO: use crypto hash
   private hashText(text: string): string {
     // Simple hash using btoa (not cryptographic, just for demo)
     // In production, use crypto.subtle.digest or a library like tweetnacl

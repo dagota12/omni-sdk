@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "pnpm -r build",
+    "build": "pnpm -r --filter=@omni-analytics/sdk build && pnpm -r --filter=@omni-analytics/react build",
     "test": "pnpm -r test",
     "dev": "pnpm -r dev"
   },
