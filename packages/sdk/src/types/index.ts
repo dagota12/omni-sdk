@@ -7,7 +7,7 @@
 export * from "./common";
 export type { ITransmitter, TransmitterConfig } from "./transmitter";
 export type { IPlugin, PluginContext, Logger, PluginMetadata } from "./plugin";
-export type { SDKConfig } from "./config";
+export type { SDKConfig, SnapshotConfig, PrivacyConfig } from "./config";
 
 // Event types
 export type { PageViewEvent, PageViewPayload } from "./events/pageView";
@@ -21,7 +21,9 @@ export type {
 } from "./events/click";
 export type {
   SessionSnapshotEvent,
+  RrwebEvent,
   SnapshotType,
   ScreenClass,
   MaskMetadata,
+  HeatmapClick,
 } from "./events/snapshot";

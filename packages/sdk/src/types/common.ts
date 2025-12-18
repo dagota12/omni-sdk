@@ -45,7 +45,8 @@ export type EventType =
   | "input"
   | "route"
   | "custom"
-  | "session_snapshot";
+  | "session_snapshot"
+  | "rrweb";
 
 /**
  * Union type for all possible events

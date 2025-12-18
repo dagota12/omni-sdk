@@ -6,7 +6,11 @@
  */
 
 import type { Event, BaseEvent, PageViewEvent, ClickEvent } from "../types";
-import type { ScreenClass } from "../types/events/snapshot";
+import type {
+  ScreenClass,
+  SessionSnapshotEvent,
+  RrwebEvent,
+} from "../types/events/snapshot";
 import { Config } from "../config/Config";
 import { SessionManager } from "../session/SessionManager";
 import { EventQueue } from "../queue/EventQueue";
@@ -204,6 +208,20 @@ export class Tracker {
   }
 
   /**
+   * Get config instance
+   */
+  getConfig(): Config {
+    return this.config;
+  }
+
+  /**
+   * Get session manager instance
+   */
+  getSessionManager(): SessionManager {
+    return this.sessionManager;
+  }
+
+  /**
    * Hash text using SHA256 (simple fallback to base64 hash)
    * In production, consider using a proper crypto library
    */
@@ -216,5 +234,84 @@ export class Tracker {
     } catch {
       return "hash-failed";
     }
+  }
+
+  /**
+   * Track a DOM snapshot event for session replay and heatmaps
+   */
+  trackSnapshot(snapshot: SessionSnapshotEvent): void {
+    if (this.config.isDebugEnabled()) {
+      console.log("[Tracker] Tracking snapshot:", snapshot);
+    }
+
+    // Convert viewport from {width, height} to {w, h} if needed
+    const viewport: { w: number; h: number } =
+      "w" in snapshot.viewport
+        ? (snapshot.viewport as any)
+        : {
+            w: (snapshot.viewport as any).width || window.innerWidth,
+            h: (snapshot.viewport as any).height || window.innerHeight,
+          };
+
+    const event: Event = {
+      ...snapshot,
+      eventId: generateUUID(),
+      projectId: this.config.getProjectId(),
+      clientId: this.config.getClientId(),
+      sessionId: snapshot.sessionId || this.sessionManager.getSessionId(),
+      userId: snapshot.userId ?? this.config.getUserId(),
+      type: "session_snapshot",
+      timestamp: snapshot.timestamp || Date.now(),
+      pageDimensions: snapshot.pageDimensions || {
+        w: document.documentElement.scrollWidth,
+        h: document.documentElement.scrollHeight,
+      },
+      viewport,
+      url: snapshot.url || window.location.href,
+      referrer: snapshot.referrer || document.referrer,
+      properties: {},
+    };
+
+    this.eventQueue.add(event as Event);
+  }
+
+  /**
+   * Track a rrweb event for session replay
+   */
+  trackRrweb(rrwebEvent: RrwebEvent): void {
+    if (this.config.isDebugEnabled()) {
+      console.log("[Tracker] Tracking rrweb event:", rrwebEvent);
+    }
+
+    const event: Event = {
+      ...rrwebEvent,
+      eventId: generateUUID(),
+      projectId: this.config.getProjectId(),
+      clientId: this.config.getClientId(),
+      sessionId: rrwebEvent.sessionId || this.sessionManager.getSessionId(),
+      userId: rrwebEvent.userId ?? this.config.getUserId(),
+      type: "rrweb",
+      timestamp: rrwebEvent.timestamp || Date.now(),
+      pageDimensions: {
+        w: document.documentElement.scrollWidth,
+        h: document.documentElement.scrollHeight,
+      },
+      viewport: {
+        w: window.innerWidth,
+        h: window.innerHeight,
+      },
+      url: rrwebEvent.url || window.location.href,
+      referrer: rrwebEvent.referrer || document.referrer,
+      properties: {},
+    };
+
+    this.eventQueue.add(event as Event);
+  }
+
+  /**
+   * Generate a unique event ID
+   */
+  private generateEventId(): string {
+    return generateUUID();
   }
 }

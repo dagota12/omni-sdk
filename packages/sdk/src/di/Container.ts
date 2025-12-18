@@ -14,14 +14,21 @@ import { FetchTransmitter, BeaconTransmitter } from "../transmitter";
 import { PluginRegistry } from "../plugins/PluginRegistry";
 import { PageViewPlugin } from "../plugins/page-view/PageViewPlugin";
 import { ClickTrackingPlugin } from "../plugins/click-tracking/ClickTrackingPlugin";
-import { SessionSnapshotPlugin } from "../plugins/session-snapshot/SessionSnapshotPlugin";
+import { ReplayPlugin } from "../plugins/replay/ReplayPlugin";
 import type { ITransmitter } from "../transmitter/ITransmitter";
 import type { IPlugin } from "../types";
+import * as rrweb from "rrweb";
 
 /**
  * Container options for customization
  */
 export interface ContainerOptions {
+  /**
+   * Optional: Custom RrWeb instance (auto-imported by default)
+   * If you need a specific rrweb version or configuration, pass it here
+   */
+  rrwebInstance?: any;
+
   /**
    * Custom transmitters (if not provided, will use Fetch + Beacon)
    */
@@ -59,15 +66,20 @@ export class Container {
   private eventQueue: EventQueue;
   private tracker: Tracker;
   private pluginRegistry: PluginRegistry;
+  private rrwebInstance: any;
   private initialized = false;
 
   constructor(sdkConfig: SDKConfig, options?: ContainerOptions) {
+    // Use provided rrweb instance or auto-import (rrweb is now required)
+    this.rrwebInstance = options?.rrwebInstance || rrweb;
+
     // Initialize Config
     this.config = new Config(sdkConfig);
 
-    // Initialize SessionManager
+    // Initialize SessionManager with inactivity timeout from config
     this.sessionManager = new SessionManager(
-      this.config.getSessionStorageKey()
+      this.config.getSessionStorageKey(),
+      this.config.getInactivityTimeoutMs()
     );
 
     // Setup Transmitters
@@ -102,7 +114,16 @@ export class Container {
     if (enableAutoTracking) {
       this.pluginRegistry.register(new PageViewPlugin());
       this.pluginRegistry.register(new ClickTrackingPlugin());
-      this.pluginRegistry.register(new SessionSnapshotPlugin());
+
+      // ReplayPlugin requires rrweb instance
+      console.log("RRWEB INSTANCE IN CONTAINER", this.rrwebInstance);
+      if (this.rrwebInstance) {
+        this.pluginRegistry.register(new ReplayPlugin(this.rrwebInstance));
+      } else if (this.config.isDebugEnabled()) {
+        console.warn(
+          "[Container] ReplayPlugin skipped: rrwebInstance not provided in options"
+        );
+      }
     }
 
     // Register custom plugins

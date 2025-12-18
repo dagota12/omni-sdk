@@ -17,7 +17,7 @@ export interface MaskMetadata {
 /**
  * Snapshot type indicator
  */
-export type SnapshotType = "initial" | "mutation" | "periodic";
+export type SnapshotType = "initial" | "mutation" | "periodic" | "rrweb";
 
 /**
  * Screen classification for responsive layouts
@@ -25,12 +25,22 @@ export type SnapshotType = "initial" | "mutation" | "periodic";
 export type ScreenClass = "mobile" | "tablet" | "desktop";
 
 /**
+ * Click data for heatmaps - normalized coordinates with element info
+ */
+export interface HeatmapClick {
+  xNorm: number; // Normalized X (0-1): (pageX + scrollX) / pageWidth
+  yNorm: number; // Normalized Y (0-1): (pageY + scrollY) / pageHeight
+  elementSelector?: string; // CSS selector for the clicked element
+  timestamp: number; // When the click occurred
+}
+
+/**
  * Session snapshot event for DOM capture
  * Used for heatmaps, session replay, layout detection, diagnostics
  */
 export interface SessionSnapshotEvent {
   type: "session_snapshot";
-  snapshotType: SnapshotType; // 'initial', 'mutation', or 'periodic'
+  snapshotType: SnapshotType; // 'initial', 'mutation', 'periodic', or 'rrweb'
   timestamp: number; // milliseconds since epoch
   sessionId: string;
   userId?: string | null;
@@ -50,5 +60,36 @@ export interface SessionSnapshotEvent {
     width: number;
     height: number;
   };
+  pageDimensions: {
+    w: number;
+    h: number;
+  };
+  referrer?: string;
+  // Heatmap data
+  clicks?: HeatmapClick[]; // Array of normalized click coordinates captured in this snapshot
+  scrollX?: number; // Horizontal scroll position
+  scrollY?: number; // Vertical scroll position
   schemaVersion: string; // Format version for backend parsing (e.g., '1.0')
+}
+
+/**
+ * RrWeb event captured from rrweb library
+ * Used for session replay with full interaction capture
+ */
+export interface RrwebEvent {
+  type: "rrweb";
+  timestamp: number; // Event timestamp
+  sessionId: string; // Logical session (shared across tabs)
+  replayId: string; // Tab-scoped replay ID (unique per tab)
+  clientId: string;
+  userId?: string | null;
+  url: string;
+  referrer?: string;
+  // Raw rrweb event data (can be Initial, Full Snapshot, or Incremental Snapshot)
+  rrwebPayload: {
+    type: number; // rrweb event type
+    data: Record<string, any>; // rrweb event data
+    timestamp?: number; // rrweb internal timestamp
+  };
+  schemaVersion: string; // Format version (e.g., '1.0')
 }

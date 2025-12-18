@@ -8,6 +8,12 @@ Complete documentation for the Omni Analytics SDK - a highly extensible, SOLID-p
 - 📚 [API Reference](./API_REFERENCE.md) - Complete API documentation
 - 🏗️ [Architecture](./ARCHITECTURE.md) - Internal design and structure
 - 🔌 [Plugin Development](./PLUGIN_DEVELOPMENT.md) - Create custom plugins
+- 📹 [Session Snapshots](./SESSION_SNAPSHOTS.md) - Session replay with DOM snapshots
+- 🎯 [Heatmaps Guide](./SESSION_SNAPSHOTS.md#heatmaps) - User interaction heatmaps
+- 🔧 [RrWeb Setup](./RRWEB_SETUP.md) - Install and configure rrweb for session replay
+- 💡 [Examples](./SNAPSHOTS_EXAMPLES.md) - Code examples for snapshots and heatmaps
+- 📋 [Implementation Summary](./IMPLEMENTATION_SUMMARY.md) - Complete feature overview
+- 📖 **[RrWeb Documentation Index](./RRWEB_DOCUMENTATION_INDEX.md)** - All RrWeb guides
 
 ## What is Omni Analytics SDK?
 
@@ -65,6 +71,19 @@ First-class React support:
 - `TrackerProvider` context
 - `useTracker` hook
 - Full TypeScript support
+
+### 📹 Session Replay & Heatmaps
+
+Advanced user behavior analysis with **rrweb** integration:
+
+- **Session Replay** - Capture and replay full user sessions with DOM snapshots
+- **Heatmaps** - Visualize user interactions with normalized coordinates
+- **Retention Metrics** - Track user journeys and funnel metrics
+- **Privacy-First** - Mask sensitive inputs, block payment forms, respect user preferences
+- **Optional Dependency** - Install rrweb separately for replay capabilities
+- **Flexible Capture** - Initial, mutation-based, or periodic snapshots
+
+[Learn more →](./RRWEB_SETUP.md)
 
 ### 🏗️ SOLID Architecture
 

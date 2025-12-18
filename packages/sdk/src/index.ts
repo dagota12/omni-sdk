@@ -85,4 +85,11 @@ export {
   ClickTrackingPlugin,
   type ClickTrackingOptions,
 } from "./plugins/click-tracking/ClickTrackingPlugin";
+export { SessionSnapshotPlugin } from "./plugins/session-snapshot/SessionSnapshotPlugin";
+export type { SessionSnapshotPluginOptions } from "./plugins/session-snapshot/SessionSnapshotPlugin";
+export { RrwebManager, transformRrwebEvent } from "./utils/rrwebIntegration";
+export type {
+  RrwebManagerConfig,
+  RrwebLibrary,
+} from "./utils/rrwebIntegration";
 export type { IPlugin, PluginContext, Logger } from "./types";
