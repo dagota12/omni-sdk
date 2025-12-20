@@ -27,6 +27,10 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # BUILD CHECK
+      - name: Build packages
+        run: pnpm run build
+
       - name: Ensure changeset exists
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
