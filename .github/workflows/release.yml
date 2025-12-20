@@ -37,6 +37,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # BUILD CHECK
+      - name: Build packages
+        run: pnpm run build
       # 🔒 SAFETY CHECK
       - name: Ensure versions are committed
         run: pnpm changeset status || echo "No version bumps; continuing"
