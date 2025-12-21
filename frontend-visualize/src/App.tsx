@@ -12,7 +12,7 @@ export function App() {
       <BrowserRouter>
         <div className="min-h-screen bg-background">
           {/* Header / Navigation */}
-          <header className="border-b border-border bg-card sticky top-0 z-10">
+          <header className="border-b backdrop-blur-md border-border bg-card sticky top-0 z-10">
             <div className="max-w-7xl mx-auto px-4 py-4">
               <div className="flex items-center justify-between">
                 <div>

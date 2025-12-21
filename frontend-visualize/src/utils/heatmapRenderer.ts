@@ -149,19 +149,37 @@ export function renderHeatmapToCanvas(
   // Find max count for normalization
   const maxCount = Math.max(...gridPoints.map((p) => p.count), 1);
 
-  // Draw grid points as circles with heatmap coloring
+  // Draw grid points with Gaussian blur using radial gradients
   gridPoints.forEach((point) => {
     const x = padding + point.xNorm * pageWidth;
     const y = padding + point.yNorm * pageHeight;
     const intensity = point.count / maxCount;
+    const radius = Math.max(8, intensity * 25); // Blur radius scales with intensity
 
-    // Draw circle with intensity-based color
-    ctx.fillStyle = intensityToColor(intensity);
-    ctx.globalAlpha = Math.max(0.3, intensity);
-    ctx.beginPath();
-    ctx.arc(x, y, Math.max(3, intensity * 15), 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
+    // Create radial gradient for Gaussian blur effect
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+
+    // Get color for this intensity
+    const color = intensityToColor(intensity);
+    const opacity = Math.max(0.5, intensity);
+
+    // Parse RGB from intensityToColor output
+    const rgbMatch = color.match(/\d+/g);
+    if (rgbMatch && rgbMatch.length >= 3) {
+      const r = rgbMatch[0];
+      const g = rgbMatch[1];
+      const b = rgbMatch[2];
+
+      // Create gradient: opaque at center, fade to transparent at edges
+      gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${opacity})`);
+      gradient.addColorStop(0.6, `rgba(${r}, ${g}, ${b}, ${opacity * 0.5})`);
+      gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
   });
 
   // Draw axis labels
