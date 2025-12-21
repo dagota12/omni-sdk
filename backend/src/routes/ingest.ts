@@ -1,5 +1,7 @@
 import { z } from "zod";
 import type { Context } from "hono";
+import type { Queue, Job } from "bullmq";
+import type { IncomingBatch } from "../types";
 
 /**
  * Zod schemas for incoming batch validation
@@ -103,7 +105,7 @@ export function validateBatch(
  * POST /ingest handler
  * Accept batch, validate, enqueue, respond 202
  */
-export async function ingestHandler(c: Context, queue: any) {
+export async function ingestHandler(c: Context, queue: Queue<IncomingBatch>) {
   try {
     const body = await c.req.json();
 
@@ -125,7 +127,7 @@ export async function ingestHandler(c: Context, queue: any) {
     console.log("[Ingest] Queue instance:", queue ? "✓ exists" : "✗ null");
 
     try {
-      const job = await Promise.race([
+      const job = (await Promise.race([
         queue.add("ingest", batch, {
           jobId: batch.batchId,
         }),
@@ -135,7 +137,7 @@ export async function ingestHandler(c: Context, queue: any) {
             5000
           )
         ),
-      ]);
+      ])) as Job<IncomingBatch>;
 
       console.log(
         `[Ingest] ✓ Enqueued batch ${batch.batchId} with ${batch.events.length} events (Job ID: ${job.id})`

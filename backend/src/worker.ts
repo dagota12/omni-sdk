@@ -1,11 +1,16 @@
 import { Worker } from "bullmq";
-import { createIngestionQueue, redisClient } from "./queue";
+import { createIngestionQueue } from "./queue";
 import {
   processRrwebEvent,
   processClickEvent,
   processPageViewEvent,
 } from "./processors";
-import type { IncomingBatch, Event } from "./types";
+import type {
+  IncomingBatch,
+  Event,
+  RrwebEventData,
+  ClickEventData,
+} from "./types";
 
 /**
  * Start the worker process
@@ -59,7 +64,10 @@ export async function startWorker() {
       return results;
     },
     {
-      connection: redisClient,
+      connection: {
+        url: process.env.REDIS_URL || "redis://localhost:6379",
+        maxRetriesPerRequest: null,
+      },
       concurrency: 1, // Process one batch at a time
     }
   );
@@ -94,9 +102,9 @@ async function routeEvent(event: Event) {
 
   switch (eventType) {
     case "rrweb":
-      return await processRrwebEvent(event as any);
+      return await processRrwebEvent(event as RrwebEventData);
     case "click":
-      return await processClickEvent(event as any);
+      return await processClickEvent(event as ClickEventData);
     case "pageview":
       return await processPageViewEvent(event);
     case "input":

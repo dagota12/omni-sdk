@@ -1,11 +1,13 @@
 import type { Context } from "hono";
+import type { Queue } from "bullmq";
+import type { IncomingBatch } from "../types";
 import { checkDbConnection } from "../db/client";
 
 /**
  * GET /health handler
  * Returns system health status
  */
-export async function healthHandler(c: Context, queue: any) {
+export async function healthHandler(c: Context, queue: Queue<IncomingBatch>) {
   try {
     const dbOk = await checkDbConnection();
 

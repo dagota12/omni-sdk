@@ -1,16 +1,17 @@
 import { Queue, Worker } from "bullmq";
 import { createClient } from "redis";
+import type { RedisClientType } from "redis";
 import type { IncomingBatch } from "../types";
 
 // Create Redis client for regular operations
 const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
 
-const redisClient = createClient({
+const redisClient: RedisClientType = createClient({
   url: redisUrl,
   socket: {
     reconnectStrategy: (retries) => Math.min(retries * 50, 500),
   },
-}) as any;
+});
 
 redisClient.on("error", (err: any) => console.error("Redis Client Error", err));
 redisClient.on("connect", () => console.log("✓ Redis client connected"));

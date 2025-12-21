@@ -27,7 +27,7 @@ app.use(
 );
 
 // Global state for queue
-let queue: any = null;
+let queue: Awaited<ReturnType<typeof createIngestionQueue>> | null = null;
 
 /**
  * Initialize app dependencies
